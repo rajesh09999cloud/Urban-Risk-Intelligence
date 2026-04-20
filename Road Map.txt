@@ -1,0 +1,30 @@
+Act as a senior data science architect and mentor.
+
+I am building a portfolio-level project called "Real-Time Urban Risk Intelligence System" that predicts crime, accident, and environmental risk using machine learning and geospatial analysis.
+
+Tech stack:
+
+* Jupyter Notebook for data analysis and ML
+* Python (Flask/FastAPI) for backend
+* MySQL for database
+* HTML/CSS/JavaScript (Leaflet.js) for frontend
+
+I want a COMPLETE step-by-step roadmap including:
+
+1. Data collection strategy (specific sources and formats)
+2. Data cleaning and feature engineering steps
+3. Model selection (with justification like a senior engineer)
+4. Evaluation metrics and validation strategy
+5. API design structure
+6. Database schema design (MySQL)
+7. Frontend architecture for map visualization
+8. Deployment strategy (free tools preferred)
+9. Scaling considerations (like real-world system design)
+
+Also include:
+
+* folder structure
+* timeline (4–6 weeks plan)
+* common mistakes to avoid
+
+Make it detailed, practical, and industry-level—not beginner.

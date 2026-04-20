@@ -1,0 +1,51 @@
+urban-risk-intelligence/
+
+
+├── data/
+│   ├── raw/                  # never modify, timestamped downloads
+│   ├── processed/            # cleaned CSVs, H3-aggregated
+│   └── features/             # feature matrices, Parquet format
+├── notebooks/
+│   ├── 01_eda.ipynb
+│   ├── 02_feature_engineering.ipynb
+│   ├── 03_model_training.ipynb
+│   └── 04_evaluation.ipynb
+├── src/
+│   ├── ingestion/
+│   │   ├── crime_fetcher.py
+│   │   ├── accident_fetcher.py
+│   │   └── env_fetcher.py
+│   ├── features/
+│   │   ├── spatial.py        # H3 grid, spatial lag features
+│   │   ├── temporal.py       # rolling windows, time features
+│   │   └── pipeline.py       # sklearn Pipeline definition
+│   ├── models/
+│   │   ├── crime_model.py
+│   │   ├── accident_model.py
+│   │   ├── env_model.py
+│   │   └── ensemble.py       # composite scorer
+│   └── db/
+│       ├── schema.sql
+│       └── crud.py           # SQLAlchemy models + queries
+├── api/
+│   ├── main.py               # FastAPI app entry point
+│   ├── routers/
+│   │   ├── predict.py
+│   │   ├── heatmap.py
+│   │   └── incidents.py
+│   ├── schemas.py            # Pydantic models
+│   └── deps.py               # DB session, auth dependencies
+├── frontend/
+│   ├── index.html
+│   ├── css/style.css
+│   └── js/
+│       ├── map.js            # Leaflet init, layer management
+│       ├── api.js            # fetch wrappers for backend
+│       └── charts.js         # Chart.js dashboard panels
+├── etl/
+│   └── refresh_data.py       # nightly job, called by GitHub Actions
+├── .github/workflows/
+│   └── nightly_refresh.yml
+├── requirements.txt
+├── docker-compose.yml        # local dev: MySQL + API
+└── README.md
