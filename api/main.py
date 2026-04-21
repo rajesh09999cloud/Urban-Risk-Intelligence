@@ -3,12 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 import pickle
 import pandas as pd
 import os
+import gdown
 
-app = FastAPI(
-    title="Urban Risk Intelligence API",
-    description="Predicts crime risk for Chicago",
-    version="1.0"
-)
+app = FastAPI(title="Urban Risk Intelligence API", version="1.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -18,14 +15,32 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+MODEL_FILES = {
+    "models/cell_features.csv":       "1BmKFFzz5yE54bBO4nvE6_eOSTDPndQFo",
+    "models/crime_features_v3.pkl":   "1lid29NBoOwFEehWyvK6epShprO-gjleo",
+    "models/crime_model_v3.pkl":      "1upbWKTOf-zBxApa_-XP_6rPG1wRauwWJ",
+    "models/daily_cell_features.csv": "157JrSlTvvqxEzxQa-0bmAbb9vE6_Jb1a",
+}
+
+def download_models():
+    os.makedirs("models", exist_ok=True)
+    for path, file_id in MODEL_FILES.items():
+        if not os.path.exists(path):
+            print(f"Downloading {path}...")
+            gdown.download(f"https://drive.google.com/uc?id={file_id}", path, quiet=False)
+            print(f"Done: {path}")
+        else:
+            print(f"Already exists: {path}")
+
 @app.on_event("startup")
 async def load_models():
-    print("Loading model...")
-    app.state.model = pickle.load(open("models/crime_model_v3.pkl", "rb"))
-    app.state.features = pickle.load(open("models/crime_features_v3.pkl", "rb"))
-    app.state.cell_features = pd.read_csv("models/cell_features.csv")
+    download_models()
+    print("Loading models into memory...")
+    app.state.model          = pickle.load(open("models/crime_model_v3.pkl", "rb"))
+    app.state.features       = pickle.load(open("models/crime_features_v3.pkl", "rb"))
+    app.state.cell_features  = pd.read_csv("models/cell_features.csv")
     app.state.daily_features = pd.read_csv("models/daily_cell_features.csv")
-    print("Model loaded successfully!")
+    print("All models loaded!")
 
 @app.get("/")
 def root():

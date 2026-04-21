@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.env
+venv/
+.ipynb_checkpoints/
+*.ipynb
+models/
+chicago_crimes_2023.csv

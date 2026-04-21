@@ -5,648 +5,574 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Urban Risk Intelligence System</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', sans-serif; background: #0f0f1a; color: #e0e0e0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Inter',sans-serif;background:#0f0f1a;color:#e0e0e0;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
 
-    /* NAVBAR */
-    #navbar { background: #13131f; border-bottom: 1px solid #ffffff10; padding: 0 24px; height: 56px; display: flex; align-items: center; justify-content: space-between; z-index: 1000; flex-shrink: 0; }
-    .nav-brand { display: flex; align-items: center; gap: 12px; }
-    .nav-logo { width: 32px; height: 32px; background: linear-gradient(135deg, #e94560, #f5a623); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; color: white; }
-    .nav-title { font-size: 15px; font-weight: 600; color: white; }
-    .nav-subtitle { font-size: 11px; color: #666; }
-    .nav-stats { display: flex; gap: 24px; }
-    .nav-stat { text-align: center; }
-    .nav-stat-value { font-size: 18px; font-weight: 700; color: #e94560; }
-    .nav-stat-label { font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
-    .nav-right { display: flex; align-items: center; gap: 16px; }
-    .nav-status { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #888; }
-    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #1d9e75; animation: pulse 2s infinite; }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-    .predict-mode-btn { padding: 6px 14px; border-radius: 20px; border: 1px solid #e9456044; background: transparent; color: #e94560; font-size: 12px; cursor: pointer; transition: all 0.2s; }
-    .predict-mode-btn.active { background: #e9456022; border-color: #e94560; }
-    .predict-mode-btn:hover { background: #e9456022; }
+    #navbar{background:#13131f;border-bottom:1px solid #ffffff10;padding:0 20px;height:58px;display:flex;align-items:center;justify-content:space-between;z-index:1000;flex-shrink:0;}
+    .nav-brand{display:flex;align-items:center;gap:12px;}
+    .nav-logo{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#e94560,#f5a623);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:white;}
+    .nav-title{font-size:15px;font-weight:600;color:white;}
+    .nav-subtitle{font-size:11px;color:#555;}
+    .nav-center{display:flex;gap:28px;}
+    .nav-stat{text-align:center;}
+    .nav-stat-value{font-size:18px;font-weight:700;color:#e94560;}
+    .nav-stat-label{font-size:10px;color:#444;text-transform:uppercase;letter-spacing:.5px;}
+    .nav-right{display:flex;align-items:center;gap:12px;}
+    .predict-btn{padding:7px 16px;border-radius:20px;border:1px solid #e9456055;background:transparent;color:#e94560;font-size:12px;cursor:pointer;transition:.2s;font-family:'Inter',sans-serif;}
+    .predict-btn:hover{background:#e9456022;}
+    .predict-btn.active{background:#e9456033;border-color:#e94560;}
+    .api-pill{display:flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:11px;background:#1a1a2e;border:1px solid #ffffff10;white-space:nowrap;}
+    .api-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+    .api-dot.online{background:#1d9e75;animation:pulse 2s infinite;}
+    .api-dot.offline{background:#e24b4a;}
+    .api-dot.loading{background:#ef9f27;animation:pulse .8s infinite;}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
-    /* LAYOUT */
-    #main { display: flex; flex: 1; overflow: hidden; }
+    #main{display:flex;flex:1;overflow:hidden;}
 
-    /* SIDEBAR */
-    #sidebar { width: 280px; background: #13131f; border-right: 1px solid #ffffff08; display: flex; flex-direction: column; overflow-y: auto; flex-shrink: 0; }
-    .sidebar-section { padding: 16px; border-bottom: 1px solid #ffffff08; }
-    .section-title { font-size: 10px; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+    #sidebar{width:270px;background:#13131f;border-right:1px solid #ffffff08;display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0;}
+    .sb-section{padding:14px 16px;border-bottom:1px solid #ffffff06;}
+    .sb-title{font-size:10px;font-weight:600;color:#444;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
 
-    /* Risk buttons */
-    .risk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .risk-btn { padding: 10px 8px; border: 1px solid #ffffff10; border-radius: 10px; background: #1a1a2e; color: #aaa; cursor: pointer; font-size: 11px; font-weight: 500; text-align: center; transition: all 0.2s; }
-    .risk-btn:hover { border-color: #e9456044; color: #e94560; }
-    .risk-btn.active { background: #e9456022; border-color: #e94560; color: #e94560; }
-    .risk-btn-icon { font-size: 18px; display: block; margin-bottom: 4px; }
+    .risk-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+    .rbtn{padding:10px 6px;border:1px solid #ffffff10;border-radius:10px;background:#1a1a2e;color:#777;cursor:pointer;font-size:11px;font-weight:500;text-align:center;transition:.2s;font-family:'Inter',sans-serif;}
+    .rbtn:hover{border-color:#e9456033;color:#e94560;}
+    .rbtn.active{background:#e9456018;border-color:#e94560;color:#e94560;}
+    .rbtn-icon{font-size:16px;display:block;margin-bottom:3px;}
 
-    /* Toggle row */
-    .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; font-size: 12px; color: #aaa; }
-    .toggle { position: relative; width: 36px; height: 20px; }
-    .toggle input { opacity: 0; width: 0; height: 0; }
-    .toggle-slider { position: absolute; inset: 0; background: #333; border-radius: 20px; cursor: pointer; transition: 0.3s; }
-    .toggle-slider:before { content:''; position: absolute; width: 14px; height: 14px; left: 3px; top: 3px; background: white; border-radius: 50%; transition: 0.3s; }
-    input:checked + .toggle-slider { background: #e94560; }
-    input:checked + .toggle-slider:before { transform: translateX(16px); }
+    .tog-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;font-size:12px;color:#999;}
+    .tog{position:relative;width:34px;height:18px;flex-shrink:0;}
+    .tog input{opacity:0;width:0;height:0;}
+    .tog-sl{position:absolute;inset:0;background:#2a2a3e;border-radius:18px;cursor:pointer;transition:.3s;}
+    .tog-sl:before{content:'';position:absolute;width:12px;height:12px;left:3px;top:3px;background:#555;border-radius:50%;transition:.3s;}
+    input:checked+.tog-sl{background:#e94560;}
+    input:checked+.tog-sl:before{transform:translateX(16px);background:white;}
 
-    /* Stats */
-    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .stat-card { background: #1a1a2e; border: 1px solid #ffffff08; border-radius: 10px; padding: 12px; }
-    .stat-card-value { font-size: 20px; font-weight: 700; color: white; }
-    .stat-card-label { font-size: 10px; color: #555; margin-top: 2px; }
-    .stat-card.red .stat-card-value { color: #e24b4a; }
-    .stat-card.amber .stat-card-value { color: #ef9f27; }
-    .stat-card.green .stat-card-value { color: #1d9e75; }
-    .stat-card.blue .stat-card-value { color: #378add; }
+    .heat-settings{margin-top:10px;display:none;}
+    .heat-settings.visible{display:block;}
+    .heat-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;font-size:11px;color:#777;}
+    .heat-row input[type=range]{flex:1;accent-color:#e94560;}
+    .heat-val{width:24px;text-align:right;color:#aaa;font-size:11px;}
+    .heat-source{display:flex;gap:6px;margin-top:8px;}
+    .heat-src-btn{flex:1;padding:6px;border:1px solid #ffffff10;border-radius:8px;background:#1a1a2e;color:#777;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;transition:.2s;}
+    .heat-src-btn.active{background:#e9456018;border-color:#e94560;color:#e94560;}
 
-    /* Legend */
-    .legend-item { display: flex; align-items: center; gap: 10px; padding: 5px 0; font-size: 12px; color: #aaa; }
-    .legend-bar { flex: 1; height: 6px; border-radius: 3px; }
-    .legend-label { width: 55px; font-size: 11px; }
-    .legend-pct { font-size: 10px; color: #555; width: 35px; text-align: right; }
+    .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+    .sc{background:#1a1a2e;border:1px solid #ffffff08;border-radius:10px;padding:11px;}
+    .sc-val{font-size:22px;font-weight:700;}
+    .sc-lbl{font-size:10px;color:#444;margin-top:2px;}
+    .sc.red .sc-val{color:#e24b4a;}
+    .sc.amb .sc-val{color:#ef9f27;}
+    .sc.grn .sc-val{color:#1d9e75;}
+    .sc.blu .sc-val{color:#378add;}
 
-    /* Cell detail */
-    #cell-detail { display: none; }
-    .detail-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-    .detail-title { font-size: 13px; font-weight: 600; color: white; }
-    .risk-badge { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
-    .badge-high { background: #e24b4a22; color: #e24b4a; border: 1px solid #e24b4a44; }
-    .badge-medium { background: #ef9f2722; color: #ef9f27; border: 1px solid #ef9f2744; }
-    .badge-low { background: #1d9e7522; color: #1d9e75; border: 1px solid #1d9e7544; }
-    .detail-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid #ffffff06; font-size: 12px; }
-    .detail-row:last-child { border-bottom: none; }
-    .detail-key { color: #666; }
-    .detail-val { color: white; font-weight: 500; }
-    .risk-bar-wrap { background: #0f0f1a; border-radius: 4px; height: 6px; margin-top: 10px; overflow: hidden; }
-    .risk-bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
+    .leg-item{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:11px;color:#888;}
+    .leg-bar{flex:1;height:5px;border-radius:3px;}
+    .leg-lbl{width:52px;}
+    .leg-pct{font-size:10px;color:#444;width:38px;text-align:right;}
 
-    /* Predict result */
-    #predict-result { display: none; }
-    .predict-card { background: #1a1a2e; border-radius: 12px; padding: 14px; border: 1px solid #ffffff10; }
-    .predict-score { font-size: 36px; font-weight: 700; text-align: center; margin: 8px 0; }
-    .predict-label { font-size: 11px; color: #666; text-align: center; margin-bottom: 10px; }
-    .predict-row { display: flex; justify-content: space-between; font-size: 11px; padding: 4px 0; color: #888; }
-    .predict-row span:last-child { color: white; font-weight: 500; }
+    #zone-detail{display:none;}
+    .dh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+    .dh-title{font-size:13px;font-weight:600;color:white;}
+    .badge{padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;}
+    .bh{background:#e24b4a18;color:#e24b4a;border:1px solid #e24b4a33;}
+    .bm{background:#ef9f2718;color:#ef9f27;border:1px solid #ef9f2733;}
+    .bl{background:#1d9e7518;color:#1d9e75;border:1px solid #1d9e7533;}
+    .dr{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #ffffff06;font-size:12px;}
+    .dr:last-child{border:none;}
+    .dk{color:#555;}
+    .dv{color:white;font-weight:500;}
+    .rbar-wrap{background:#0f0f1a;border-radius:4px;height:5px;margin-top:8px;overflow:hidden;}
+    .rbar-fill{height:100%;border-radius:4px;transition:width .5s;}
+    .nearby-btn{margin-top:10px;width:100%;padding:7px;background:#e9456015;border:1px solid #e9456033;border-radius:8px;color:#e94560;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;transition:.2s;}
+    .nearby-btn:hover{background:#e9456025;}
 
-    /* Incidents panel */
-    #incidents-panel { display: none; }
-    .incident-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid #ffffff06; }
-    .incident-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
-    .incident-type { font-size: 12px; color: white; font-weight: 500; }
-    .incident-date { font-size: 10px; color: #555; margin-top: 2px; }
-    .incidents-count { font-size: 11px; color: #555; margin-bottom: 8px; }
+    #predict-panel{display:none;}
+    .pc{background:#1a1a2e;border-radius:10px;padding:14px;border:1px solid #ffffff08;}
+    .pc-score{font-size:38px;font-weight:700;text-align:center;margin:6px 0;}
+    .pc-lbl{font-size:11px;color:#555;text-align:center;margin-bottom:8px;}
+    .pc-row{display:flex;justify-content:space-between;font-size:11px;color:#666;padding:3px 0;}
+    .pc-row span:last-child{color:#ccc;font-weight:500;}
 
-    /* Loading */
-    #loading-overlay { position: absolute; inset: 0; background: #0f0f1aee; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
-    .spinner { width: 40px; height: 40px; border: 3px solid #ffffff10; border-top-color: #e94560; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 16px; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .loading-text { font-size: 13px; color: #888; }
-    .loading-sub { font-size: 11px; color: #555; margin-top: 6px; }
+    #incidents-panel{display:none;}
+    .inc-count{font-size:11px;color:#555;margin-bottom:8px;}
+    .inc-item{display:flex;gap:8px;padding:7px 0;border-bottom:1px solid #ffffff05;}
+    .inc-dot{width:7px;height:7px;border-radius:50%;margin-top:4px;flex-shrink:0;}
+    .inc-type{font-size:12px;color:white;font-weight:500;}
+    .inc-date{font-size:10px;color:#444;margin-top:2px;}
 
-    /* Map */
-    #map-wrap { flex: 1; position: relative; }
-    #map { width: 100%; height: 100%; }
+    #offline-banner{display:none;background:#e24b4a12;border:1px solid #e24b4a22;border-radius:8px;padding:10px 12px;margin:12px 16px 0;font-size:11px;color:#e24b4a;line-height:1.7;}
+    #offline-banner b{display:block;margin-bottom:3px;font-size:12px;}
 
-    /* Predict cursor */
-    #map.predict-cursor { cursor: crosshair; }
+    #credit{padding:14px 16px;margin-top:auto;border-top:1px solid #ffffff06;font-size:11px;line-height:1.8;}
+    .credit-name{color:#e94560;font-weight:600;font-size:12px;}
+    .credit-project{color:#555;}
+    .credit-stack{color:#333;font-size:10px;}
 
-    /* Predict pin popup */
-    .predict-popup { background: #13131f; border: 1px solid #e9456044; border-radius: 12px; padding: 12px 16px; min-width: 180px; }
-    .predict-popup-score { font-size: 28px; font-weight: 700; text-align: center; }
-    .predict-popup-label { font-size: 10px; color: #666; text-align: center; margin-bottom: 8px; }
-    .predict-popup-row { display: flex; justify-content: space-between; font-size: 11px; color: #888; padding: 2px 0; }
-    .predict-popup-row span:last-child { color: white; }
+    #loading-overlay{position:absolute;inset:0;background:#0f0f1acc;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;}
+    .spinner{width:36px;height:36px;border:3px solid #ffffff10;border-top-color:#e94560;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:14px;}
+    @keyframes spin{to{transform:rotate(360deg);}}
+    .ld-txt{font-size:13px;color:#888;}
+    .ld-sub{font-size:11px;color:#444;margin-top:5px;}
 
-    /* Info bar */
-    #infobar { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); background: #13131fee; border: 1px solid #ffffff10; border-radius: 20px; padding: 8px 20px; font-size: 11px; color: #666; z-index: 500; white-space: nowrap; backdrop-filter: blur(10px); transition: all 0.3s; }
-    #infobar.predict-mode { border-color: #e9456066; color: #e94560; }
+    #map-wrap{flex:1;position:relative;}
+    #map{width:100%;height:100%;}
+    #map.crosshair{cursor:crosshair!important;}
+    #infobar{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:#13131fdd;border:1px solid #ffffff10;border-radius:20px;padding:7px 18px;font-size:11px;color:#555;z-index:500;white-space:nowrap;backdrop-filter:blur(8px);transition:.3s;}
+    #infobar.pred{border-color:#e9456055;color:#e94560;}
 
-    /* Scrollbar */
-    #sidebar::-webkit-scrollbar { width: 4px; }
-    #sidebar::-webkit-scrollbar-track { background: transparent; }
-    #sidebar::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+    .leaflet-popup-content-wrapper{background:#13131f!important;border:1px solid #ffffff15!important;border-radius:12px!important;box-shadow:0 8px 32px #000a!important;}
+    .leaflet-popup-tip{background:#13131f!important;}
+    .leaflet-popup-content{margin:0!important;}
+    .leaflet-popup-close-button{color:#555!important;top:8px!important;right:10px!important;}
 
-    /* Leaflet popup override */
-    .leaflet-popup-content-wrapper { background: #13131f !important; border: 1px solid #ffffff15 !important; border-radius: 12px !important; box-shadow: 0 8px 32px #00000088 !important; }
-    .leaflet-popup-tip { background: #13131f !important; }
-    .leaflet-popup-content { margin: 0 !important; }
-    .leaflet-popup-close-button { color: #666 !important; font-size: 18px !important; top: 8px !important; right: 10px !important; }
+    #sidebar::-webkit-scrollbar{width:3px;}
+    #sidebar::-webkit-scrollbar-thumb{background:#2a2a3e;border-radius:2px;}
   </style>
 </head>
 <body>
 
-<!-- NAVBAR -->
 <div id="navbar">
   <div class="nav-brand">
-    <div class="nav-logo">U</div>
+    <div class="nav-logo">RI</div>
     <div>
       <div class="nav-title">Urban Risk Intelligence System</div>
       <div class="nav-subtitle">Chicago Crime Risk Analysis — 2023</div>
     </div>
   </div>
-  <div class="nav-stats">
-    <div class="nav-stat">
-      <div class="nav-stat-value" id="total-cells">—</div>
-      <div class="nav-stat-label">Risk Zones</div>
-    </div>
-    <div class="nav-stat">
-      <div class="nav-stat-value" id="high-risk-count">—</div>
-      <div class="nav-stat-label">High Risk</div>
-    </div>
-    <div class="nav-stat">
-      <div class="nav-stat-value" id="avg-risk">—</div>
-      <div class="nav-stat-label">Avg Risk</div>
-    </div>
+  <div class="nav-center">
+    <div class="nav-stat"><div class="nav-stat-value" id="n-zones">—</div><div class="nav-stat-label">Risk Zones</div></div>
+    <div class="nav-stat"><div class="nav-stat-value" id="n-high">—</div><div class="nav-stat-label">High Risk</div></div>
+    <div class="nav-stat"><div class="nav-stat-value" id="n-avg">—</div><div class="nav-stat-label">Avg Risk</div></div>
   </div>
   <div class="nav-right">
-    <button class="predict-mode-btn" id="predict-mode-btn" onclick="togglePredictMode()">
-      Click to Predict
-    </button>
-    <div class="nav-status">
-      <div class="status-dot"></div>
-      <span id="api-status">Connecting...</span>
+    <button class="predict-btn" id="pred-btn" onclick="togglePredict()">Click to Predict</button>
+    <div class="api-pill">
+      <div class="api-dot loading" id="api-dot"></div>
+      <span id="api-txt">Connecting...</span>
     </div>
   </div>
 </div>
 
-<!-- MAIN -->
 <div id="main">
+<div id="sidebar">
 
-  <div id="sidebar">
-
-    <!-- Risk Type -->
-    <div class="sidebar-section">
-      <div class="section-title">Risk Type</div>
-      <div class="risk-grid">
-        <button class="risk-btn active" data-type="composite" onclick="switchRisk(this)">
-          <span class="risk-btn-icon">⬡</span>Composite
-        </button>
-        <button class="risk-btn" data-type="crime" onclick="switchRisk(this)">
-          <span class="risk-btn-icon">⚠</span>Crime
-        </button>
-      </div>
-    </div>
-
-    <!-- Layer Toggles -->
-    <div class="sidebar-section">
-      <div class="section-title">Map Layers</div>
-      <div class="toggle-row">
-        <span>Risk Hexagons</span>
-        <label class="toggle">
-          <input type="checkbox" id="toggle-hex" checked onchange="toggleLayer('hex', this.checked)">
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
-      <div class="toggle-row">
-        <span>Incident Markers</span>
-        <label class="toggle">
-          <input type="checkbox" id="toggle-incidents" onchange="toggleLayer('incidents', this.checked)">
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
-    </div>
-
-    <!-- Stats -->
-    <div class="sidebar-section">
-      <div class="section-title">City Overview</div>
-      <div class="stats-grid">
-        <div class="stat-card red">
-          <div class="stat-card-value" id="s-high">—</div>
-          <div class="stat-card-label">High Risk</div>
-        </div>
-        <div class="stat-card amber">
-          <div class="stat-card-value" id="s-medium">—</div>
-          <div class="stat-card-label">Medium</div>
-        </div>
-        <div class="stat-card green">
-          <div class="stat-card-value" id="s-low">—</div>
-          <div class="stat-card-label">Low Risk</div>
-        </div>
-        <div class="stat-card blue">
-          <div class="stat-card-value" id="s-total">—</div>
-          <div class="stat-card-label">Total Zones</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Legend -->
-    <div class="sidebar-section">
-      <div class="section-title">Risk Legend</div>
-      <div class="legend-item">
-        <div class="legend-label">Critical</div>
-        <div class="legend-bar" style="background:#E24B4A"></div>
-        <div class="legend-pct">&gt;80%</div>
-      </div>
-      <div class="legend-item">
-        <div class="legend-label">High</div>
-        <div class="legend-bar" style="background:#EF9F27"></div>
-        <div class="legend-pct">60-80%</div>
-      </div>
-      <div class="legend-item">
-        <div class="legend-label">Medium</div>
-        <div class="legend-bar" style="background:#FAC775"></div>
-        <div class="legend-pct">40-60%</div>
-      </div>
-      <div class="legend-item">
-        <div class="legend-label">Low</div>
-        <div class="legend-bar" style="background:#97C459"></div>
-        <div class="legend-pct">20-40%</div>
-      </div>
-      <div class="legend-item">
-        <div class="legend-label">Safe</div>
-        <div class="legend-bar" style="background:#1D9E75"></div>
-        <div class="legend-pct">&lt;20%</div>
-      </div>
-    </div>
-
-    <!-- Zone Detail (shown on hex click) -->
-    <div class="sidebar-section" id="cell-detail">
-      <div class="section-title">Selected Zone</div>
-      <div class="detail-header">
-        <div class="detail-title" id="d-cell">—</div>
-        <div class="risk-badge" id="d-badge">—</div>
-      </div>
-      <div class="detail-row">
-        <span class="detail-key">Risk Score</span>
-        <span class="detail-val" id="d-score">—</span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-key">Total Crimes</span>
-        <span class="detail-val" id="d-crimes">—</span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-key">Violent Rate</span>
-        <span class="detail-val" id="d-violent">—</span>
-      </div>
-      <div class="detail-row">
-        <span class="detail-key">Risk Level</span>
-        <span class="detail-val" id="d-level">—</span>
-      </div>
-      <div class="risk-bar-wrap">
-        <div class="risk-bar-fill" id="d-bar" style="width:0%"></div>
-      </div>
-      <button style="margin-top:10px;width:100%;padding:8px;background:#e9456022;border:1px solid #e9456044;border-radius:8px;color:#e94560;font-size:12px;cursor:pointer;" onclick="loadNearbyIncidents()">
-        Show Nearby Incidents
-      </button>
-    </div>
-
-    <!-- Predict Result (shown on map click in predict mode) -->
-    <div class="sidebar-section" id="predict-result">
-      <div class="section-title">Live Prediction</div>
-      <div class="predict-card">
-        <div class="predict-label">Crime Risk Score</div>
-        <div class="predict-score" id="pr-score">—</div>
-        <div class="predict-label" id="pr-level">—</div>
-        <div class="predict-row"><span>Lat</span><span id="pr-lat">—</span></div>
-        <div class="predict-row"><span>Lon</span><span id="pr-lon">—</span></div>
-        <div class="predict-row"><span>Time</span><span id="pr-time">—</span></div>
-        <div class="predict-row"><span>Cell ID</span><span id="pr-cell">—</span></div>
-      </div>
-    </div>
-
-    <!-- Nearby Incidents List -->
-    <div class="sidebar-section" id="incidents-panel">
-      <div class="section-title">Nearby Incidents</div>
-      <div class="incidents-count" id="incidents-count"></div>
-      <div id="incidents-list"></div>
-    </div>
-
+  <div id="offline-banner">
+    <b>API Offline</b>
+    Start uvicorn server + ngrok tunnel, or deploy to Render.com for permanent access.
   </div>
 
-  <!-- MAP -->
-  <div id="map-wrap">
-    <div id="loading-overlay">
-      <div class="spinner"></div>
-      <div class="loading-text">Loading Risk Intelligence...</div>
-      <div class="loading-sub" id="loading-sub">Connecting to API...</div>
+  <div class="sb-section">
+    <div class="sb-title">Risk Type</div>
+    <div class="risk-grid">
+      <button class="rbtn active" data-type="composite" onclick="switchRisk(this)"><span class="rbtn-icon">⬡</span>Composite</button>
+      <button class="rbtn" data-type="crime" onclick="switchRisk(this)"><span class="rbtn-icon">⚠</span>Crime</button>
     </div>
-    <div id="map"></div>
-    <div id="infobar">Click any hexagon to view details</div>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-title">Map Layers</div>
+    <div class="tog-row">
+      <span>Risk Hexagons</span>
+      <label class="tog"><input type="checkbox" id="tog-hex" checked onchange="toggleLayer('hex',this.checked)"><span class="tog-sl"></span></label>
+    </div>
+    <div class="tog-row">
+      <span>Incident Markers</span>
+      <label class="tog"><input type="checkbox" id="tog-inc" onchange="toggleLayer('inc',this.checked)"><span class="tog-sl"></span></label>
+    </div>
+    <div class="tog-row">
+      <span>Crime Heatmap</span>
+      <label class="tog"><input type="checkbox" id="tog-heat" onchange="toggleLayer('heat',this.checked)"><span class="tog-sl"></span></label>
+    </div>
+
+    <!-- Heatmap settings — shown only when heatmap is ON -->
+    <div class="heat-settings" id="heat-settings">
+      <div class="sb-title" style="margin-top:10px">Heatmap Settings</div>
+      <div class="heat-row">
+        <span>Radius</span>
+        <input type="range" min="5" max="50" value="25" id="h-radius" oninput="updateHeat()">
+        <span class="heat-val" id="h-radius-val">25</span>
+      </div>
+      <div class="heat-row">
+        <span>Blur</span>
+        <input type="range" min="1" max="30" value="15" id="h-blur" oninput="updateHeat()">
+        <span class="heat-val" id="h-blur-val">15</span>
+      </div>
+      <div class="heat-row">
+        <span>Opacity</span>
+        <input type="range" min="1" max="10" value="7" id="h-opacity" oninput="updateHeat()">
+        <span class="heat-val" id="h-opacity-val">0.7</span>
+      </div>
+      <div style="font-size:10px;color:#444;margin-top:6px;margin-bottom:4px">DATA SOURCE</div>
+      <div class="heat-source">
+        <button class="heat-src-btn active" id="hsrc-zone" onclick="switchHeatSource('zone')">Zone Risk</button>
+        <button class="heat-src-btn" id="hsrc-inc" onclick="switchHeatSource('inc')">Incidents</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-title">City Overview</div>
+    <div class="stats-grid">
+      <div class="sc red"><div class="sc-val" id="s-h">—</div><div class="sc-lbl">High Risk</div></div>
+      <div class="sc amb"><div class="sc-val" id="s-m">—</div><div class="sc-lbl">Medium</div></div>
+      <div class="sc grn"><div class="sc-val" id="s-l">—</div><div class="sc-lbl">Low Risk</div></div>
+      <div class="sc blu"><div class="sc-val" id="s-t">—</div><div class="sc-lbl">Total Zones</div></div>
+    </div>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-title">Risk Legend</div>
+    <div class="leg-item"><div class="leg-lbl">Critical</div><div class="leg-bar" style="background:#E24B4A"></div><div class="leg-pct">&gt;80%</div></div>
+    <div class="leg-item"><div class="leg-lbl">High</div><div class="leg-bar" style="background:#EF9F27"></div><div class="leg-pct">60-80%</div></div>
+    <div class="leg-item"><div class="leg-lbl">Medium</div><div class="leg-bar" style="background:#FAC775"></div><div class="leg-pct">40-60%</div></div>
+    <div class="leg-item"><div class="leg-lbl">Low</div><div class="leg-bar" style="background:#97C459"></div><div class="leg-pct">20-40%</div></div>
+    <div class="leg-item"><div class="leg-lbl">Safe</div><div class="leg-bar" style="background:#1D9E75"></div><div class="leg-pct">&lt;20%</div></div>
+  </div>
+
+  <div class="sb-section" id="zone-detail">
+    <div class="sb-title">Selected Zone</div>
+    <div class="dh">
+      <div class="dh-title" id="d-cell">—</div>
+      <div class="badge" id="d-badge">—</div>
+    </div>
+    <div class="dr"><span class="dk">Risk Score</span><span class="dv" id="d-score">—</span></div>
+    <div class="dr"><span class="dk">Total Crimes</span><span class="dv" id="d-crimes">—</span></div>
+    <div class="dr"><span class="dk">Violent Rate</span><span class="dv" id="d-violent">—</span></div>
+    <div class="dr"><span class="dk">Risk Level</span><span class="dv" id="d-level">—</span></div>
+    <div class="rbar-wrap"><div class="rbar-fill" id="d-bar" style="width:0%"></div></div>
+    <button class="nearby-btn" onclick="loadNearby()">Show Nearby Incidents</button>
+  </div>
+
+  <div class="sb-section" id="predict-panel">
+    <div class="sb-title">Live Prediction</div>
+    <div class="pc">
+      <div class="pc-lbl">Crime Risk Score</div>
+      <div class="pc-score" id="pr-score">—</div>
+      <div class="pc-lbl" id="pr-level">—</div>
+      <div class="pc-row"><span>Latitude</span><span id="pr-lat">—</span></div>
+      <div class="pc-row"><span>Longitude</span><span id="pr-lon">—</span></div>
+      <div class="pc-row"><span>Time</span><span id="pr-time">—</span></div>
+      <div class="pc-row"><span>Cell ID</span><span id="pr-cell">—</span></div>
+    </div>
+  </div>
+
+  <div class="sb-section" id="incidents-panel">
+    <div class="sb-title">Nearby Incidents</div>
+    <div class="inc-count" id="inc-count"></div>
+    <div id="inc-list"></div>
+  </div>
+
+  <div id="credit">
+    <div class="credit-name">Done by Rajesh Vinjam</div>
+    <div class="credit-project">Real-Time Urban Risk Intelligence System</div>
+    <div class="credit-stack">Machine Learning · FastAPI · Leaflet.js · XGBoost</div>
   </div>
 
 </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<div id="map-wrap">
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <div class="ld-txt">Loading Risk Intelligence...</div>
+    <div class="ld-sub" id="ld-sub">Connecting to API...</div>
+  </div>
+  <div id="map"></div>
+  <div id="infobar">Click any hexagon to view zone details</div>
+</div>
+</div>
+
 <script>
-
+  // UPDATE THIS LINE with your new ngrok URL each time you restart tunnel
+  // Once deployed to Render.com, replace with your permanent Render URL
   const API_URL = "https://cannon-frenzy-dense.ngrok-free.dev";
+  const HEADERS = {'ngrok-skip-browser-warning':'true'};
 
-  const map = L.map('map', { zoomControl: false }).setView([41.8781, -87.6298], 11);
-  L.control.zoom({ position: 'bottomright' }).addTo(map);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: 'CartoDB', maxZoom: 19
+  const map = L.map('map',{zoomControl:false}).setView([41.8781,-87.6298],11);
+  L.control.zoom({position:'bottomright'}).addTo(map);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
+    attribution:'CartoDB',maxZoom:19
   }).addTo(map);
 
-  let riskLayer      = null;
-  let incidentLayer  = null;
-  let predictMarker  = null;
-  let predictMode    = false;
-  let allFeatures    = [];
-  let selectedLatLng = null;
+  let riskLayer    = null;
+  let incLayer     = null;
+  let heatLayer    = null;
+  let predMarker   = null;
+  let predictMode  = false;
+  let allFeatures  = [];
+  let incidentData = [];
+  let clickedLL    = null;
+  let heatSource   = 'zone';
 
-  /* ── COLORS ── */
-  function getRiskColor(score) {
-    if (score > 0.8) return '#E24B4A';
-    if (score > 0.6) return '#EF9F27';
-    if (score > 0.4) return '#FAC775';
-    if (score > 0.2) return '#97C459';
-    return '#1D9E75';
-  }
-  function getBadgeClass(level) {
-    return level === 'HIGH' ? 'badge-high' : level === 'MEDIUM' ? 'badge-medium' : 'badge-low';
-  }
+  const CRIME_COLORS = {
+    'BATTERY':'#e24b4a','ASSAULT':'#e24b4a','ROBBERY':'#e24b4a',
+    'HOMICIDE':'#8b0000','THEFT':'#ef9f27','BURGLARY':'#ef9f27',
+    'CRIMINAL DAMAGE':'#fac775','NARCOTICS':'#97c459',
+    'OTHER OFFENSE':'#378add','MOTOR VEHICLE THEFT':'#f5a623'
+  };
 
-  /* ── STATS ── */
-  function updateStats(features) {
-    const total  = features.length;
-    const high   = features.filter(f => f.properties.risk_score > 0.6).length;
-    const medium = features.filter(f => f.properties.risk_score > 0.35 && f.properties.risk_score <= 0.6).length;
-    const low    = features.filter(f => f.properties.risk_score <= 0.35).length;
-    const avg    = features.reduce((s, f) => s + f.properties.risk_score, 0) / total;
-    document.getElementById('total-cells').textContent    = total;
-    document.getElementById('high-risk-count').textContent = high;
-    document.getElementById('avg-risk').textContent       = (avg * 100).toFixed(0) + '%';
-    document.getElementById('s-high').textContent   = high;
-    document.getElementById('s-medium').textContent = medium;
-    document.getElementById('s-low').textContent    = low;
-    document.getElementById('s-total').textContent  = total;
+  function rc(s){return s>0.8?'#E24B4A':s>0.6?'#EF9F27':s>0.4?'#FAC775':s>0.2?'#97C459':'#1D9E75';}
+  function bc(l){return l==='HIGH'?'bh':l==='MEDIUM'?'bm':'bl';}
+
+  function setApi(state,txt){
+    document.getElementById('api-dot').className='api-dot '+state;
+    document.getElementById('api-txt').textContent=txt;
+    document.getElementById('offline-banner').style.display=state==='offline'?'block':'none';
   }
 
-  /* ── FEATURE 1: ZONE DETAIL on hex click ── */
-  function showCellDetail(props) {
-    document.getElementById('cell-detail').style.display = 'block';
-    document.getElementById('predict-result').style.display = 'none';
-
-    document.getElementById('d-cell').textContent    = 'Zone ' + props.cell_id.substring(0, 8) + '...';
-    document.getElementById('d-score').textContent   = (props.risk_score * 100).toFixed(1) + '%';
-    document.getElementById('d-crimes').textContent  = props.total_crimes.toLocaleString();
-    document.getElementById('d-violent').textContent = (props.violent_rate * 100).toFixed(1) + '%';
-    document.getElementById('d-level').textContent   = props.risk_level;
-
-    const badge = document.getElementById('d-badge');
-    badge.textContent = props.risk_level;
-    badge.className   = 'risk-badge ' + getBadgeClass(props.risk_level);
-
-    const bar = document.getElementById('d-bar');
-    bar.style.width      = (props.risk_score * 100) + '%';
-    bar.style.background = getRiskColor(props.risk_score);
-
-    document.getElementById('infobar').textContent =
-      'Zone risk: ' + (props.risk_score * 100).toFixed(1) + '% | ' + props.total_crimes + ' crimes';
-
-    selectedLatLng = null;
+  function updateStats(f){
+    const t=f.length,h=f.filter(x=>x.properties.risk_score>0.6).length,
+          m=f.filter(x=>x.properties.risk_score>0.35&&x.properties.risk_score<=0.6).length,
+          l=f.filter(x=>x.properties.risk_score<=0.35).length,
+          a=f.reduce((s,x)=>s+x.properties.risk_score,0)/t;
+    document.getElementById('n-zones').textContent=t;
+    document.getElementById('n-high').textContent=h;
+    document.getElementById('n-avg').textContent=(a*100).toFixed(0)+'%';
+    document.getElementById('s-h').textContent=h;
+    document.getElementById('s-m').textContent=m;
+    document.getElementById('s-l').textContent=l;
+    document.getElementById('s-t').textContent=t;
   }
 
-  /* ── FEATURE 2: INCIDENT MARKERS ── */
-  async function loadIncidentMarkers() {
-    if (incidentLayer) map.removeLayer(incidentLayer);
+  /* ZONE DETAIL */
+  function showZone(p){
+    document.getElementById('zone-detail').style.display='block';
+    document.getElementById('predict-panel').style.display='none';
+    document.getElementById('d-cell').textContent='Zone '+p.cell_id.substring(0,8)+'...';
+    document.getElementById('d-score').textContent=(p.risk_score*100).toFixed(1)+'%';
+    document.getElementById('d-crimes').textContent=p.total_crimes.toLocaleString();
+    document.getElementById('d-violent').textContent=(p.violent_rate*100).toFixed(1)+'%';
+    document.getElementById('d-level').textContent=p.risk_level;
+    const b=document.getElementById('d-badge');
+    b.textContent=p.risk_level; b.className='badge '+bc(p.risk_level);
+    const bar=document.getElementById('d-bar');
+    bar.style.width=(p.risk_score*100)+'%';
+    bar.style.background=rc(p.risk_score);
+    document.getElementById('infobar').textContent='Zone: '+(p.risk_score*100).toFixed(1)+'% risk | '+p.total_crimes+' crimes';
+  }
 
-    const resp = await fetch(
-      API_URL + '/api/v1/incidents?lat=41.8781&lon=-87.6298&radius_km=15&limit=300',
-      { headers: { 'ngrok-skip-browser-warning': 'true' } }
-    );
-    const data = await resp.json();
-
-    const colorMap = {
-      'BATTERY': '#e24b4a', 'ASSAULT': '#e24b4a', 'ROBBERY': '#e24b4a',
-      'HOMICIDE': '#8b0000', 'THEFT': '#ef9f27', 'BURGLARY': '#ef9f27',
-      'CRIMINAL DAMAGE': '#fac775', 'NARCOTICS': '#97c459',
-      'OTHER OFFENSE': '#378add', 'MOTOR VEHICLE THEFT': '#f5a623'
-    };
-
-    const markers = [];
-    data.incidents.forEach(inc => {
-      const color  = colorMap[inc.type] || '#555';
-      const icon   = L.divIcon({
-        className: '',
-        html: `<div style="width:8px;height:8px;border-radius:50%;background:${color};border:1px solid #fff4;opacity:0.85"></div>`,
-        iconSize: [8, 8],
-        iconAnchor: [4, 4]
+  /* INCIDENT MARKERS */
+  async function loadIncMarkers(){
+    if(incLayer) map.removeLayer(incLayer);
+    try{
+      const r=await fetch(API_URL+'/api/v1/incidents?lat=41.8781&lon=-87.6298&radius_km=15&limit=500',{headers:HEADERS});
+      const d=await r.json();
+      incidentData=d.incidents;
+      const markers=d.incidents.map(inc=>{
+        const c=CRIME_COLORS[inc.type]||'#555';
+        const icon=L.divIcon({className:'',
+          html:`<div style="width:8px;height:8px;border-radius:50%;background:${c};border:1px solid #fff3;opacity:.85"></div>`,
+          iconSize:[8,8],iconAnchor:[4,4]});
+        const m=L.marker([inc.lat,inc.lon],{icon});
+        m.bindPopup(`<div style="padding:10px;min-width:150px">
+          <div style="font-weight:600;color:${c};margin-bottom:5px">${inc.type}</div>
+          <div style="font-size:11px;color:#888">${inc.date.substring(0,10)}</div>
+          <div style="font-size:11px;color:#666;margin-top:3px">Arrest: ${inc.arrest}</div>
+        </div>`);
+        return m;
       });
-      const marker = L.marker([inc.lat, inc.lon], { icon });
-      marker.bindPopup(`
-        <div style="padding:10px;min-width:160px">
-          <div style="font-weight:600;color:${color};margin-bottom:6px">${inc.type}</div>
-          <div style="font-size:11px;color:#888">${inc.date.substring(0, 10)}</div>
-          <div style="font-size:11px;color:#666;margin-top:4px">Arrest: ${inc.arrest}</div>
-        </div>
-      `);
-      markers.push(marker);
-    });
-
-    incidentLayer = L.layerGroup(markers).addTo(map);
+      incLayer=L.layerGroup(markers).addTo(map);
+    }catch(e){console.error(e);}
   }
 
-  function toggleLayer(type, visible) {
-    if (type === 'hex') {
-      if (riskLayer) {
-        if (visible) map.addLayer(riskLayer);
-        else map.removeLayer(riskLayer);
-      }
+  /* HEATMAP */
+  function buildHeatLayer(){
+    if(heatLayer) map.removeLayer(heatLayer);
+    const radius  = parseInt(document.getElementById('h-radius').value);
+    const blur    = parseInt(document.getElementById('h-blur').value);
+    const opacity = parseInt(document.getElementById('h-opacity').value)/10;
+
+    let points=[];
+    if(heatSource==='zone' && allFeatures.length>0){
+      points=allFeatures.map(f=>{
+        const coords=f.geometry.coordinates[0];
+        const lat=coords.reduce((s,c)=>s+c[1],0)/coords.length;
+        const lon=coords.reduce((s,c)=>s+c[0],0)/coords.length;
+        return [lat,lon,f.properties.risk_score];
+      });
+    } else if(heatSource==='inc' && incidentData.length>0){
+      points=incidentData.map(inc=>[inc.lat,inc.lon,0.8]);
     }
-    if (type === 'incidents') {
-      if (visible) {
-        loadIncidentMarkers();
-      } else {
-        if (incidentLayer) map.removeLayer(incidentLayer);
-      }
-    }
+
+    if(points.length===0) return;
+    heatLayer=L.heatLayer(points,{
+      radius,blur,maxZoom:17,max:1.0,minOpacity:opacity,
+      gradient:{0.2:'#1D9E75',0.4:'#97C459',0.6:'#FAC775',0.8:'#EF9F27',1.0:'#E24B4A'}
+    }).addTo(map);
   }
 
-  /* ── FEATURE 3: PREDICT on map click ── */
-  function togglePredictMode() {
-    predictMode = !predictMode;
-    const btn = document.getElementById('predict-mode-btn');
-    const mapEl = document.getElementById('map');
-    const infobar = document.getElementById('infobar');
+  function updateHeat(){
+    document.getElementById('h-radius-val').textContent=document.getElementById('h-radius').value;
+    document.getElementById('h-blur-val').textContent=document.getElementById('h-blur').value;
+    document.getElementById('h-opacity-val').textContent=(parseInt(document.getElementById('h-opacity').value)/10).toFixed(1);
+    if(heatLayer) buildHeatLayer();
+  }
 
-    btn.classList.toggle('active', predictMode);
-    mapEl.classList.toggle('predict-cursor', predictMode);
-
-    if (predictMode) {
-      btn.textContent = 'Exit Predict Mode';
-      infobar.textContent = 'Click anywhere on the map to predict risk';
-      infobar.classList.add('predict-mode');
+  function switchHeatSource(src){
+    heatSource=src;
+    document.getElementById('hsrc-zone').classList.toggle('active',src==='zone');
+    document.getElementById('hsrc-inc').classList.toggle('active',src==='inc');
+    if(src==='inc' && incidentData.length===0){
+      loadIncMarkers().then(()=>buildHeatLayer());
     } else {
-      btn.textContent = 'Click to Predict';
-      infobar.textContent = 'Click any hexagon to view details';
-      infobar.classList.remove('predict-mode');
-      if (predictMarker) { map.removeLayer(predictMarker); predictMarker = null; }
-      document.getElementById('predict-result').style.display = 'none';
+      buildHeatLayer();
     }
   }
 
-  map.on('click', async function(e) {
-    if (!predictMode) return;
+  /* LAYER TOGGLE */
+  function toggleLayer(type,visible){
+    if(type==='hex'){
+      if(riskLayer){visible?map.addLayer(riskLayer):map.removeLayer(riskLayer);}
+    }
+    if(type==='inc'){
+      if(visible) loadIncMarkers();
+      else if(incLayer) map.removeLayer(incLayer);
+    }
+    if(type==='heat'){
+      document.getElementById('heat-settings').classList.toggle('visible',visible);
+      if(visible){
+        if(allFeatures.length===0){
+          document.getElementById('infobar').textContent='Load risk zones first to use heatmap';
+        } else {
+          buildHeatLayer();
+        }
+      } else {
+        if(heatLayer){map.removeLayer(heatLayer);heatLayer=null;}
+      }
+    }
+  }
 
-    const { lat, lng } = e.latlng;
-    selectedLatLng = { lat, lng };
+  /* PREDICT */
+  function togglePredict(){
+    predictMode=!predictMode;
+    const btn=document.getElementById('pred-btn');
+    btn.classList.toggle('active',predictMode);
+    document.getElementById('map').classList.toggle('crosshair',predictMode);
+    const info=document.getElementById('infobar');
+    if(predictMode){
+      btn.textContent='Exit Predict Mode';
+      info.textContent='Click anywhere on map to predict crime risk';
+      info.classList.add('pred');
+    } else {
+      btn.textContent='Click to Predict';
+      info.textContent='Click any hexagon to view zone details';
+      info.classList.remove('pred');
+      if(predMarker){map.removeLayer(predMarker);predMarker=null;}
+      document.getElementById('predict-panel').style.display='none';
+    }
+  }
 
-    if (predictMarker) map.removeLayer(predictMarker);
-
-    const pinIcon = L.divIcon({
-      className: '',
-      html: `<div style="width:20px;height:20px;border-radius:50%;background:#e94560;border:3px solid white;box-shadow:0 0 10px #e9456088"></div>`,
-      iconSize: [20, 20],
-      iconAnchor: [10, 10]
-    });
-    predictMarker = L.marker([lat, lng], { icon: pinIcon }).addTo(map);
-    predictMarker.bindPopup('<div style="padding:8px;color:#888;font-size:12px">Predicting...</div>').openPopup();
-
-    document.getElementById('infobar').textContent = 'Predicting risk...';
-
-    try {
-      const now = new Date().toISOString().replace('T', ' ').substring(0, 19);
-      const resp = await fetch(API_URL + '/api/v1/predict/risk', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'ngrok-skip-browser-warning': 'true'
-        },
-        body: JSON.stringify({ lat, lon: lng, datetime_str: now })
+  map.on('click',async function(e){
+    if(!predictMode) return;
+    const{lat,lng}=e.latlng;
+    clickedLL={lat,lng};
+    if(predMarker) map.removeLayer(predMarker);
+    const pin=L.divIcon({className:'',
+      html:`<div style="width:22px;height:22px;border-radius:50%;background:#e94560;border:3px solid white;box-shadow:0 0 14px #e9456099"></div>`,
+      iconSize:[22,22],iconAnchor:[11,11]});
+    predMarker=L.marker([lat,lng],{icon:pin}).addTo(map);
+    predMarker.bindPopup('<div style="padding:10px;color:#666;font-size:12px">Predicting...</div>').openPopup();
+    try{
+      const now=new Date().toISOString().replace('T',' ').substring(0,19);
+      const r=await fetch(API_URL+'/api/v1/predict/risk',{
+        method:'POST',
+        headers:{'Content-Type':'application/json',...HEADERS},
+        body:JSON.stringify({lat,lon:lng,datetime_str:now})
       });
-      const data = await resp.json();
-
-      const color = getRiskColor(data.crime_risk);
-      const pct   = (data.crime_risk * 100).toFixed(1);
-
-      predictMarker.getPopup().setContent(`
-        <div class="predict-popup">
-          <div class="predict-popup-label">Crime Risk Score</div>
-          <div class="predict-popup-score" style="color:${color}">${pct}%</div>
-          <div class="predict-popup-label">${data.risk_level}</div>
-          <div class="predict-popup-row"><span>Lat</span><span>${lat.toFixed(4)}</span></div>
-          <div class="predict-popup-row"><span>Lon</span><span>${lng.toFixed(4)}</span></div>
-        </div>
-      `);
-
-      document.getElementById('predict-result').style.display = 'block';
-      document.getElementById('cell-detail').style.display = 'none';
-      document.getElementById('pr-score').textContent = pct + '%';
-      document.getElementById('pr-score').style.color = color;
-      document.getElementById('pr-level').textContent = data.risk_level;
-      document.getElementById('pr-lat').textContent   = lat.toFixed(5);
-      document.getElementById('pr-lon').textContent   = lng.toFixed(5);
-      document.getElementById('pr-time').textContent  = now.substring(11, 16);
-      document.getElementById('pr-cell').textContent  = data.h3_cell_id.substring(0, 10) + '...';
-
-      document.getElementById('infobar').textContent =
-        'Predicted risk: ' + pct + '% (' + data.risk_level + ')';
-
-    } catch (err) {
-      predictMarker.getPopup().setContent('<div style="padding:8px;color:#e94560;font-size:12px">Prediction failed</div>');
-      console.error(err);
+      const d=await r.json();
+      const color=rc(d.crime_risk),pct=(d.crime_risk*100).toFixed(1);
+      predMarker.getPopup().setContent(`
+        <div style="padding:14px;min-width:170px;text-align:center">
+          <div style="font-size:11px;color:#555;margin-bottom:4px">Crime Risk Score</div>
+          <div style="font-size:34px;font-weight:700;color:${color}">${pct}%</div>
+          <div style="font-size:12px;color:${color};margin-bottom:8px">${d.risk_level}</div>
+          <div style="font-size:11px;color:#666;text-align:left">
+            <div style="display:flex;justify-content:space-between;padding:2px 0"><span>Lat</span><span style="color:#ccc">${lat.toFixed(4)}</span></div>
+            <div style="display:flex;justify-content:space-between;padding:2px 0"><span>Lon</span><span style="color:#ccc">${lng.toFixed(4)}</span></div>
+          </div>
+        </div>`);
+      document.getElementById('predict-panel').style.display='block';
+      document.getElementById('zone-detail').style.display='none';
+      document.getElementById('pr-score').textContent=pct+'%';
+      document.getElementById('pr-score').style.color=color;
+      document.getElementById('pr-level').textContent=d.risk_level;
+      document.getElementById('pr-lat').textContent=lat.toFixed(5);
+      document.getElementById('pr-lon').textContent=lng.toFixed(5);
+      document.getElementById('pr-time').textContent=now.substring(11,16);
+      document.getElementById('pr-cell').textContent=d.h3_cell_id.substring(0,10)+'...';
+      document.getElementById('infobar').textContent='Predicted: '+pct+'% ('+d.risk_level+')';
+    }catch(err){
+      predMarker.getPopup().setContent('<div style="padding:10px;color:#e94560;font-size:12px">Prediction failed — API offline</div>');
     }
   });
 
-  /* ── FEATURE 4: NEARBY INCIDENTS LIST ── */
-  async function loadNearbyIncidents() {
-    if (!selectedLatLng && allFeatures.length === 0) return;
-
-    const lat = selectedLatLng ? selectedLatLng.lat : 41.8781;
-    const lon = selectedLatLng ? selectedLatLng.lng : -87.6298;
-
-    document.getElementById('incidents-panel').style.display = 'block';
-    document.getElementById('incidents-list').innerHTML =
-      '<div style="color:#555;font-size:12px">Loading...</div>';
-
-    try {
-      const resp = await fetch(
-        `${API_URL}/api/v1/incidents?lat=${lat}&lon=${lon}&radius_km=0.5&limit=20`,
-        { headers: { 'ngrok-skip-browser-warning': 'true' } }
-      );
-      const data = await resp.json();
-
-      const colorMap = {
-        'BATTERY':'#e24b4a','ASSAULT':'#e24b4a','ROBBERY':'#e24b4a',
-        'HOMICIDE':'#8b0000','THEFT':'#ef9f27','BURGLARY':'#ef9f27',
-        'CRIMINAL DAMAGE':'#fac775','NARCOTICS':'#97c459',
-        'OTHER OFFENSE':'#378add','MOTOR VEHICLE THEFT':'#f5a623'
-      };
-
-      document.getElementById('incidents-count').textContent =
-        data.total + ' incidents within 0.5km';
-
-      if (data.incidents.length === 0) {
-        document.getElementById('incidents-list').innerHTML =
-          '<div style="color:#555;font-size:12px">No incidents found nearby</div>';
-        return;
-      }
-
-      document.getElementById('incidents-list').innerHTML = data.incidents.map(inc => `
-        <div class="incident-item">
-          <div class="incident-dot" style="background:${colorMap[inc.type]||'#555'}"></div>
-          <div>
-            <div class="incident-type">${inc.type}</div>
-            <div class="incident-date">${inc.date.substring(0,10)} · Arrest: ${inc.arrest}</div>
-          </div>
-        </div>
-      `).join('');
-
-    } catch (err) {
-      document.getElementById('incidents-list').innerHTML =
-        '<div style="color:#e94560;font-size:12px">Failed to load incidents</div>';
+  /* NEARBY INCIDENTS */
+  async function loadNearby(){
+    const lat=clickedLL?clickedLL.lat:41.8781;
+    const lon=clickedLL?clickedLL.lng:-87.6298;
+    document.getElementById('incidents-panel').style.display='block';
+    document.getElementById('inc-list').innerHTML='<div style="color:#555;font-size:12px;padding:6px 0">Loading...</div>';
+    try{
+      const r=await fetch(`${API_URL}/api/v1/incidents?lat=${lat}&lon=${lon}&radius_km=0.5&limit=20`,{headers:HEADERS});
+      const d=await r.json();
+      document.getElementById('inc-count').textContent=d.total+' incidents within 0.5km';
+      document.getElementById('inc-list').innerHTML=d.incidents.length===0
+        ?'<div style="color:#444;font-size:12px">No incidents found nearby</div>'
+        :d.incidents.map(inc=>`
+          <div class="inc-item">
+            <div class="inc-dot" style="background:${CRIME_COLORS[inc.type]||'#555'}"></div>
+            <div><div class="inc-type">${inc.type}</div>
+            <div class="inc-date">${inc.date.substring(0,10)} · Arrest: ${inc.arrest}</div></div>
+          </div>`).join('');
+    }catch(e){
+      document.getElementById('inc-list').innerHTML='<div style="color:#e94560;font-size:12px">Failed — API offline</div>';
     }
   }
 
-  /* ── LOAD HEATMAP ── */
-  async function loadHeatmap(type = 'composite') {
-    document.getElementById('loading-overlay').style.display = 'flex';
-    document.getElementById('loading-sub').textContent = 'Fetching ' + type + ' risk data...';
-
-    try {
-      const resp = await fetch(API_URL + '/api/v1/heatmap?risk_type=' + type, {
-        headers: { 'ngrok-skip-browser-warning': 'true' }
-      });
-      if (!resp.ok) throw new Error('API error ' + resp.status);
-      const data = await resp.json();
-      allFeatures = data.features;
-
-      if (riskLayer) map.removeLayer(riskLayer);
-
-      riskLayer = L.geoJSON(data, {
-        style: f => ({
-          fillColor:   getRiskColor(f.properties.risk_score),
-          fillOpacity: 0.65,
-          color:       '#000',
-          weight:      0.3
-        }),
-        onEachFeature: (f, layer) => {
-          const p = f.properties;
-          layer.on('click', function(e) {
-            if (predictMode) return;
+  /* LOAD HEATMAP */
+  async function loadHeatmap(type='composite'){
+    document.getElementById('loading-overlay').style.display='flex';
+    document.getElementById('ld-sub').textContent='Fetching '+type+' risk data...';
+    setApi('loading','Connecting...');
+    try{
+      const r=await fetch(API_URL+'/api/v1/heatmap?risk_type='+type,{headers:HEADERS});
+      if(!r.ok) throw new Error('Status '+r.status);
+      const data=await r.json();
+      allFeatures=data.features;
+      if(riskLayer) map.removeLayer(riskLayer);
+      riskLayer=L.geoJSON(data,{
+        style:f=>({fillColor:rc(f.properties.risk_score),fillOpacity:.65,color:'#000',weight:.3}),
+        onEachFeature:(f,layer)=>{
+          const p=f.properties;
+          layer.on('click',function(e){
+            if(predictMode) return;
             L.DomEvent.stopPropagation(e);
-            showCellDetail(p);
+            const coords=f.geometry.coordinates[0];
+            clickedLL={lat:coords[0][1],lng:coords[0][0]};
+            showZone(p);
           });
-          layer.on('mouseover', function() {
-            this.setStyle({ fillOpacity: 0.9, weight: 1.5, color: '#fff' });
-          });
-          layer.on('mouseout', function() {
-            this.setStyle({ fillOpacity: 0.65, weight: 0.3, color: '#000' });
-          });
-          layer.bindTooltip(
-            '<b>' + p.risk_level + '</b> — ' + (p.risk_score*100).toFixed(1) + '%<br>Crimes: ' + p.total_crimes,
-            { sticky: true }
-          );
+          layer.on('mouseover',function(){this.setStyle({fillOpacity:.9,weight:1.5,color:'#fff'});});
+          layer.on('mouseout', function(){this.setStyle({fillOpacity:.65,weight:.3,color:'#000'});});
+          layer.bindTooltip('<b>'+p.risk_level+'</b> — '+(p.risk_score*100).toFixed(1)+'%<br>Crimes: '+p.total_crimes,{sticky:true});
         }
       }).addTo(map);
-
       updateStats(allFeatures);
-      document.getElementById('api-status').textContent = 'Live — ' + data.total_cells + ' zones';
-      document.getElementById('loading-overlay').style.display = 'none';
-
-    } catch (err) {
-      document.getElementById('loading-sub').textContent = 'Error: ' + err.message;
-      document.getElementById('api-status').textContent = 'Connection failed';
-      setTimeout(() => { document.getElementById('loading-overlay').style.display = 'none'; }, 3000);
+      setApi('online','Live — '+data.total_cells+' zones');
+      document.getElementById('loading-overlay').style.display='none';
+      if(heatLayer) buildHeatLayer();
+    }catch(err){
+      setApi('offline','API Offline');
+      document.getElementById('ld-sub').textContent='API offline — start your server';
+      setTimeout(()=>{document.getElementById('loading-overlay').style.display='none';},2500);
     }
   }
 
-  function switchRisk(btn) {
-    document.querySelectorAll('.risk-btn').forEach(b => b.classList.remove('active'));
+  function switchRisk(btn){
+    document.querySelectorAll('.rbtn').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
     loadHeatmap(btn.dataset.type);
   }
