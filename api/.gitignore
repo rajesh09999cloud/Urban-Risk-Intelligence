@@ -6,3 +6,5 @@ venv/
 *.ipynb
 models/
 chicago_crimes_2023.csv
+*.pkl
+*.csv

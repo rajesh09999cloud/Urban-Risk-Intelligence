@@ -12,16 +12,20 @@
     *{margin:0;padding:0;box-sizing:border-box;}
     body{font-family:'Inter',sans-serif;background:#0f0f1a;color:#e0e0e0;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
 
-    #navbar{background:#13131f;border-bottom:1px solid #ffffff10;padding:0 20px;height:58px;display:flex;align-items:center;justify-content:space-between;z-index:1000;flex-shrink:0;}
+    /* NAVBAR */
+    #navbar{background:#13131f;border-bottom:1px solid #ffffff10;padding:0 20px;height:60px;display:flex;align-items:center;justify-content:space-between;z-index:1000;flex-shrink:0;}
     .nav-brand{display:flex;align-items:center;gap:12px;}
-    .nav-logo{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#e94560,#f5a623);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:white;}
+    .nav-logo{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#e94560,#f5a623);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:white;letter-spacing:-0.5px;}
     .nav-title{font-size:15px;font-weight:600;color:white;}
     .nav-subtitle{font-size:11px;color:#555;}
     .nav-center{display:flex;gap:28px;}
     .nav-stat{text-align:center;}
     .nav-stat-value{font-size:18px;font-weight:700;color:#e94560;}
     .nav-stat-label{font-size:10px;color:#444;text-transform:uppercase;letter-spacing:.5px;}
-    .nav-right{display:flex;align-items:center;gap:12px;}
+    .nav-right{display:flex;align-items:center;gap:14px;}
+    .nav-author{font-size:11px;color:#555;border-left:1px solid #ffffff10;padding-left:14px;}
+    .nav-author a{color:#e94560;font-weight:600;text-decoration:none;transition:.2s;}
+    .nav-author a:hover{color:#f5a623;}
     .predict-btn{padding:7px 16px;border-radius:20px;border:1px solid #e9456055;background:transparent;color:#e94560;font-size:12px;cursor:pointer;transition:.2s;font-family:'Inter',sans-serif;}
     .predict-btn:hover{background:#e9456022;}
     .predict-btn.active{background:#e9456033;border-color:#e94560;}
@@ -32,18 +36,22 @@
     .api-dot.loading{background:#ef9f27;animation:pulse .8s infinite;}
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
+    /* LAYOUT */
     #main{display:flex;flex:1;overflow:hidden;}
 
-    #sidebar{width:270px;background:#13131f;border-right:1px solid #ffffff08;display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0;}
+    /* SIDEBAR */
+    #sidebar{width:275px;background:#13131f;border-right:1px solid #ffffff08;display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0;}
     .sb-section{padding:14px 16px;border-bottom:1px solid #ffffff06;}
     .sb-title{font-size:10px;font-weight:600;color:#444;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
 
+    /* Risk buttons */
     .risk-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
     .rbtn{padding:10px 6px;border:1px solid #ffffff10;border-radius:10px;background:#1a1a2e;color:#777;cursor:pointer;font-size:11px;font-weight:500;text-align:center;transition:.2s;font-family:'Inter',sans-serif;}
     .rbtn:hover{border-color:#e9456033;color:#e94560;}
     .rbtn.active{background:#e9456018;border-color:#e94560;color:#e94560;}
     .rbtn-icon{font-size:16px;display:block;margin-bottom:3px;}
 
+    /* Toggles */
     .tog-row{display:flex;align-items:center;justify-content:space-between;padding:7px 0;font-size:12px;color:#999;}
     .tog{position:relative;width:34px;height:18px;flex-shrink:0;}
     .tog input{opacity:0;width:0;height:0;}
@@ -52,6 +60,7 @@
     input:checked+.tog-sl{background:#e94560;}
     input:checked+.tog-sl:before{transform:translateX(16px);background:white;}
 
+    /* Heatmap settings */
     .heat-settings{margin-top:10px;display:none;}
     .heat-settings.visible{display:block;}
     .heat-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;font-size:11px;color:#777;}
@@ -61,6 +70,7 @@
     .heat-src-btn{flex:1;padding:6px;border:1px solid #ffffff10;border-radius:8px;background:#1a1a2e;color:#777;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;transition:.2s;}
     .heat-src-btn.active{background:#e9456018;border-color:#e94560;color:#e94560;}
 
+    /* Stats */
     .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
     .sc{background:#1a1a2e;border:1px solid #ffffff08;border-radius:10px;padding:11px;}
     .sc-val{font-size:22px;font-weight:700;}
@@ -70,11 +80,13 @@
     .sc.grn .sc-val{color:#1d9e75;}
     .sc.blu .sc-val{color:#378add;}
 
+    /* Legend */
     .leg-item{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:11px;color:#888;}
     .leg-bar{flex:1;height:5px;border-radius:3px;}
     .leg-lbl{width:52px;}
     .leg-pct{font-size:10px;color:#444;width:38px;text-align:right;}
 
+    /* Zone detail */
     #zone-detail{display:none;}
     .dh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
     .dh-title{font-size:13px;font-weight:600;color:white;}
@@ -91,6 +103,7 @@
     .nearby-btn{margin-top:10px;width:100%;padding:7px;background:#e9456015;border:1px solid #e9456033;border-radius:8px;color:#e94560;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;transition:.2s;}
     .nearby-btn:hover{background:#e9456025;}
 
+    /* Predict panel */
     #predict-panel{display:none;}
     .pc{background:#1a1a2e;border-radius:10px;padding:14px;border:1px solid #ffffff08;}
     .pc-score{font-size:38px;font-weight:700;text-align:center;margin:6px 0;}
@@ -98,6 +111,7 @@
     .pc-row{display:flex;justify-content:space-between;font-size:11px;color:#666;padding:3px 0;}
     .pc-row span:last-child{color:#ccc;font-weight:500;}
 
+    /* Incidents panel */
     #incidents-panel{display:none;}
     .inc-count{font-size:11px;color:#555;margin-bottom:8px;}
     .inc-item{display:flex;gap:8px;padding:7px 0;border-bottom:1px solid #ffffff05;}
@@ -105,37 +119,47 @@
     .inc-type{font-size:12px;color:white;font-weight:500;}
     .inc-date{font-size:10px;color:#444;margin-top:2px;}
 
+    /* Offline banner */
     #offline-banner{display:none;background:#e24b4a12;border:1px solid #e24b4a22;border-radius:8px;padding:10px 12px;margin:12px 16px 0;font-size:11px;color:#e24b4a;line-height:1.7;}
     #offline-banner b{display:block;margin-bottom:3px;font-size:12px;}
 
-    #credit{padding:14px 16px;margin-top:auto;border-top:1px solid #ffffff06;font-size:11px;line-height:1.8;}
-    .credit-name{color:#e94560;font-weight:600;font-size:12px;}
-    .credit-project{color:#555;}
+    /* Credit */
+    #credit{padding:16px;margin-top:auto;border-top:1px solid #ffffff06;font-size:11px;line-height:2;}
+    .credit-name{font-size:13px;font-weight:600;color:white;margin-bottom:4px;}
+    .credit-links{display:flex;gap:10px;margin-bottom:4px;}
+    .credit-links a{color:#e94560;text-decoration:none;font-size:11px;font-weight:500;display:flex;align-items:center;gap:4px;padding:4px 10px;border:1px solid #e9456033;border-radius:20px;transition:.2s;}
+    .credit-links a:hover{background:#e9456022;border-color:#e94560;}
+    .credit-project{color:#555;font-size:11px;}
     .credit-stack{color:#333;font-size:10px;}
 
+    /* Loading */
     #loading-overlay{position:absolute;inset:0;background:#0f0f1acc;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;}
     .spinner{width:36px;height:36px;border:3px solid #ffffff10;border-top-color:#e94560;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:14px;}
     @keyframes spin{to{transform:rotate(360deg);}}
     .ld-txt{font-size:13px;color:#888;}
     .ld-sub{font-size:11px;color:#444;margin-top:5px;}
 
+    /* Map */
     #map-wrap{flex:1;position:relative;}
     #map{width:100%;height:100%;}
     #map.crosshair{cursor:crosshair!important;}
     #infobar{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:#13131fdd;border:1px solid #ffffff10;border-radius:20px;padding:7px 18px;font-size:11px;color:#555;z-index:500;white-space:nowrap;backdrop-filter:blur(8px);transition:.3s;}
     #infobar.pred{border-color:#e9456055;color:#e94560;}
 
+    /* Leaflet popup */
     .leaflet-popup-content-wrapper{background:#13131f!important;border:1px solid #ffffff15!important;border-radius:12px!important;box-shadow:0 8px 32px #000a!important;}
     .leaflet-popup-tip{background:#13131f!important;}
     .leaflet-popup-content{margin:0!important;}
     .leaflet-popup-close-button{color:#555!important;top:8px!important;right:10px!important;}
 
+    /* Scrollbar */
     #sidebar::-webkit-scrollbar{width:3px;}
     #sidebar::-webkit-scrollbar-thumb{background:#2a2a3e;border-radius:2px;}
   </style>
 </head>
 <body>
 
+<!-- NAVBAR -->
 <div id="navbar">
   <div class="nav-brand">
     <div class="nav-logo">RI</div>
@@ -144,12 +168,27 @@
       <div class="nav-subtitle">Chicago Crime Risk Analysis — 2023</div>
     </div>
   </div>
+
   <div class="nav-center">
-    <div class="nav-stat"><div class="nav-stat-value" id="n-zones">—</div><div class="nav-stat-label">Risk Zones</div></div>
-    <div class="nav-stat"><div class="nav-stat-value" id="n-high">—</div><div class="nav-stat-label">High Risk</div></div>
-    <div class="nav-stat"><div class="nav-stat-value" id="n-avg">—</div><div class="nav-stat-label">Avg Risk</div></div>
+    <div class="nav-stat">
+      <div class="nav-stat-value" id="n-zones">—</div>
+      <div class="nav-stat-label">Risk Zones</div>
+    </div>
+    <div class="nav-stat">
+      <div class="nav-stat-value" id="n-high">—</div>
+      <div class="nav-stat-label">High Risk</div>
+    </div>
+    <div class="nav-stat">
+      <div class="nav-stat-value" id="n-avg">—</div>
+      <div class="nav-stat-label">Avg Risk</div>
+    </div>
   </div>
+
   <div class="nav-right">
+    <div class="nav-author">
+      Built by
+      <a href="https://www.linkedin.com/in/rajesh-vinjam-5a2261320" target="_blank">Rajesh Vinjam</a>
+    </div>
     <button class="predict-btn" id="pred-btn" onclick="togglePredict()">Click to Predict</button>
     <div class="api-pill">
       <div class="api-dot loading" id="api-dot"></div>
@@ -158,22 +197,29 @@
   </div>
 </div>
 
+<!-- MAIN -->
 <div id="main">
 <div id="sidebar">
 
   <div id="offline-banner">
     <b>API Offline</b>
-    Start uvicorn server + ngrok tunnel, or deploy to Render.com for permanent access.
+    The backend is starting up. Please wait 30–60 seconds and refresh — Render free tier wakes up on first request.
   </div>
 
+  <!-- Risk Type -->
   <div class="sb-section">
     <div class="sb-title">Risk Type</div>
     <div class="risk-grid">
-      <button class="rbtn active" data-type="composite" onclick="switchRisk(this)"><span class="rbtn-icon">⬡</span>Composite</button>
-      <button class="rbtn" data-type="crime" onclick="switchRisk(this)"><span class="rbtn-icon">⚠</span>Crime</button>
+      <button class="rbtn active" data-type="composite" onclick="switchRisk(this)">
+        <span class="rbtn-icon">⬡</span>Composite
+      </button>
+      <button class="rbtn" data-type="crime" onclick="switchRisk(this)">
+        <span class="rbtn-icon">⚠</span>Crime
+      </button>
     </div>
   </div>
 
+  <!-- Map Layers -->
   <div class="sb-section">
     <div class="sb-title">Map Layers</div>
     <div class="tog-row">
@@ -189,9 +235,8 @@
       <label class="tog"><input type="checkbox" id="tog-heat" onchange="toggleLayer('heat',this.checked)"><span class="tog-sl"></span></label>
     </div>
 
-    <!-- Heatmap settings — shown only when heatmap is ON -->
     <div class="heat-settings" id="heat-settings">
-      <div class="sb-title" style="margin-top:10px">Heatmap Settings</div>
+      <div class="sb-title" style="margin-top:10px;">Heatmap Settings</div>
       <div class="heat-row">
         <span>Radius</span>
         <input type="range" min="5" max="50" value="25" id="h-radius" oninput="updateHeat()">
@@ -215,6 +260,7 @@
     </div>
   </div>
 
+  <!-- City Stats -->
   <div class="sb-section">
     <div class="sb-title">City Overview</div>
     <div class="stats-grid">
@@ -225,6 +271,7 @@
     </div>
   </div>
 
+  <!-- Legend -->
   <div class="sb-section">
     <div class="sb-title">Risk Legend</div>
     <div class="leg-item"><div class="leg-lbl">Critical</div><div class="leg-bar" style="background:#E24B4A"></div><div class="leg-pct">&gt;80%</div></div>
@@ -234,6 +281,7 @@
     <div class="leg-item"><div class="leg-lbl">Safe</div><div class="leg-bar" style="background:#1D9E75"></div><div class="leg-pct">&lt;20%</div></div>
   </div>
 
+  <!-- Zone Detail -->
   <div class="sb-section" id="zone-detail">
     <div class="sb-title">Selected Zone</div>
     <div class="dh">
@@ -248,6 +296,7 @@
     <button class="nearby-btn" onclick="loadNearby()">Show Nearby Incidents</button>
   </div>
 
+  <!-- Predict Panel -->
   <div class="sb-section" id="predict-panel">
     <div class="sb-title">Live Prediction</div>
     <div class="pc">
@@ -261,20 +310,31 @@
     </div>
   </div>
 
+  <!-- Incidents Panel -->
   <div class="sb-section" id="incidents-panel">
     <div class="sb-title">Nearby Incidents</div>
     <div class="inc-count" id="inc-count"></div>
     <div id="inc-list"></div>
   </div>
 
+  <!-- Credit -->
   <div id="credit">
-    <div class="credit-name">Done by Rajesh Vinjam</div>
+    <div class="credit-name">Rajesh Vinjam</div>
+    <div class="credit-links">
+      <a href="https://www.linkedin.com/in/rajesh-vinjam-5a2261320" target="_blank">
+        🔗 LinkedIn
+      </a>
+      <a href="https://github.com/rajesh09999cloud" target="_blank">
+        🐙 GitHub
+      </a>
+    </div>
     <div class="credit-project">Real-Time Urban Risk Intelligence System</div>
-    <div class="credit-stack">Machine Learning · FastAPI · Leaflet.js · XGBoost</div>
+    <div class="credit-stack">XGBoost · FastAPI · H3 Grid · Leaflet.js</div>
   </div>
 
 </div>
 
+<!-- MAP -->
 <div id="map-wrap">
   <div id="loading-overlay">
     <div class="spinner"></div>
@@ -287,10 +347,8 @@
 </div>
 
 <script>
-  // UPDATE THIS LINE with your new ngrok URL each time you restart tunnel
-  // Once deployed to Render.com, replace with your permanent Render URL
-  const API_URL = "https://cannon-frenzy-dense.ngrok-free.dev";
-  const HEADERS = {'ngrok-skip-browser-warning':'true'};
+  const API_URL = "https://urban-risk-intelligence.onrender.com";
+  const HEADERS = {};
 
   const map = L.map('map',{zoomControl:false}).setView([41.8781,-87.6298],11);
   L.control.zoom({position:'bottomright'}).addTo(map);
@@ -325,10 +383,11 @@
   }
 
   function updateStats(f){
-    const t=f.length,h=f.filter(x=>x.properties.risk_score>0.6).length,
-          m=f.filter(x=>x.properties.risk_score>0.35&&x.properties.risk_score<=0.6).length,
-          l=f.filter(x=>x.properties.risk_score<=0.35).length,
-          a=f.reduce((s,x)=>s+x.properties.risk_score,0)/t;
+    const t=f.length;
+    const h=f.filter(x=>x.properties.risk_score>0.6).length;
+    const m=f.filter(x=>x.properties.risk_score>0.35&&x.properties.risk_score<=0.6).length;
+    const l=f.filter(x=>x.properties.risk_score<=0.35).length;
+    const a=f.reduce((s,x)=>s+x.properties.risk_score,0)/t;
     document.getElementById('n-zones').textContent=t;
     document.getElementById('n-high').textContent=h;
     document.getElementById('n-avg').textContent=(a*100).toFixed(0)+'%';
@@ -348,7 +407,8 @@
     document.getElementById('d-violent').textContent=(p.violent_rate*100).toFixed(1)+'%';
     document.getElementById('d-level').textContent=p.risk_level;
     const b=document.getElementById('d-badge');
-    b.textContent=p.risk_level; b.className='badge '+bc(p.risk_level);
+    b.textContent=p.risk_level;
+    b.className='badge '+bc(p.risk_level);
     const bar=document.getElementById('d-bar');
     bar.style.width=(p.risk_score*100)+'%';
     bar.style.background=rc(p.risk_score);
@@ -367,16 +427,16 @@
         const icon=L.divIcon({className:'',
           html:`<div style="width:8px;height:8px;border-radius:50%;background:${c};border:1px solid #fff3;opacity:.85"></div>`,
           iconSize:[8,8],iconAnchor:[4,4]});
-        const m=L.marker([inc.lat,inc.lon],{icon});
-        m.bindPopup(`<div style="padding:10px;min-width:150px">
+        const mk=L.marker([inc.lat,inc.lon],{icon});
+        mk.bindPopup(`<div style="padding:10px;min-width:150px">
           <div style="font-weight:600;color:${c};margin-bottom:5px">${inc.type}</div>
           <div style="font-size:11px;color:#888">${inc.date.substring(0,10)}</div>
           <div style="font-size:11px;color:#666;margin-top:3px">Arrest: ${inc.arrest}</div>
         </div>`);
-        return m;
+        return mk;
       });
       incLayer=L.layerGroup(markers).addTo(map);
-    }catch(e){console.error(e);}
+    }catch(e){console.error('Incidents error:',e);}
   }
 
   /* HEATMAP */
@@ -385,19 +445,17 @@
     const radius  = parseInt(document.getElementById('h-radius').value);
     const blur    = parseInt(document.getElementById('h-blur').value);
     const opacity = parseInt(document.getElementById('h-opacity').value)/10;
-
     let points=[];
     if(heatSource==='zone' && allFeatures.length>0){
       points=allFeatures.map(f=>{
         const coords=f.geometry.coordinates[0];
         const lat=coords.reduce((s,c)=>s+c[1],0)/coords.length;
         const lon=coords.reduce((s,c)=>s+c[0],0)/coords.length;
-        return [lat,lon,f.properties.risk_score];
+        return[lat,lon,f.properties.risk_score];
       });
     } else if(heatSource==='inc' && incidentData.length>0){
       points=incidentData.map(inc=>[inc.lat,inc.lon,0.8]);
     }
-
     if(points.length===0) return;
     heatLayer=L.heatLayer(points,{
       radius,blur,maxZoom:17,max:1.0,minOpacity:opacity,
@@ -423,7 +481,7 @@
     }
   }
 
-  /* LAYER TOGGLE */
+  /* LAYER TOGGLES */
   function toggleLayer(type,visible){
     if(type==='hex'){
       if(riskLayer){visible?map.addLayer(riskLayer):map.removeLayer(riskLayer);}
@@ -436,7 +494,7 @@
       document.getElementById('heat-settings').classList.toggle('visible',visible);
       if(visible){
         if(allFeatures.length===0){
-          document.getElementById('infobar').textContent='Load risk zones first to use heatmap';
+          document.getElementById('infobar').textContent='Wait for risk zones to load first';
         } else {
           buildHeatLayer();
         }
@@ -446,7 +504,7 @@
     }
   }
 
-  /* PREDICT */
+  /* PREDICT MODE */
   function togglePredict(){
     predictMode=!predictMode;
     const btn=document.getElementById('pred-btn');
@@ -480,11 +538,12 @@
       const now=new Date().toISOString().replace('T',' ').substring(0,19);
       const r=await fetch(API_URL+'/api/v1/predict/risk',{
         method:'POST',
-        headers:{'Content-Type':'application/json',...HEADERS},
+        headers:{'Content-Type':'application/json'},
         body:JSON.stringify({lat,lon:lng,datetime_str:now})
       });
       const d=await r.json();
-      const color=rc(d.crime_risk),pct=(d.crime_risk*100).toFixed(1);
+      const color=rc(d.crime_risk);
+      const pct=(d.crime_risk*100).toFixed(1);
       predMarker.getPopup().setContent(`
         <div style="padding:14px;min-width:170px;text-align:center">
           <div style="font-size:11px;color:#555;margin-bottom:4px">Crime Risk Score</div>
@@ -506,7 +565,7 @@
       document.getElementById('pr-cell').textContent=d.h3_cell_id.substring(0,10)+'...';
       document.getElementById('infobar').textContent='Predicted: '+pct+'% ('+d.risk_level+')';
     }catch(err){
-      predMarker.getPopup().setContent('<div style="padding:10px;color:#e94560;font-size:12px">Prediction failed — API offline</div>');
+      predMarker.getPopup().setContent('<div style="padding:10px;color:#e94560;font-size:12px">Prediction failed — API starting up, try again in 30s</div>');
     }
   });
 
@@ -525,11 +584,13 @@
         :d.incidents.map(inc=>`
           <div class="inc-item">
             <div class="inc-dot" style="background:${CRIME_COLORS[inc.type]||'#555'}"></div>
-            <div><div class="inc-type">${inc.type}</div>
-            <div class="inc-date">${inc.date.substring(0,10)} · Arrest: ${inc.arrest}</div></div>
+            <div>
+              <div class="inc-type">${inc.type}</div>
+              <div class="inc-date">${inc.date.substring(0,10)} · Arrest: ${inc.arrest}</div>
+            </div>
           </div>`).join('');
     }catch(e){
-      document.getElementById('inc-list').innerHTML='<div style="color:#e94560;font-size:12px">Failed — API offline</div>';
+      document.getElementById('inc-list').innerHTML='<div style="color:#e94560;font-size:12px">Failed — API starting up</div>';
     }
   }
 
@@ -545,7 +606,10 @@
       allFeatures=data.features;
       if(riskLayer) map.removeLayer(riskLayer);
       riskLayer=L.geoJSON(data,{
-        style:f=>({fillColor:rc(f.properties.risk_score),fillOpacity:.65,color:'#000',weight:.3}),
+        style:f=>({
+          fillColor:rc(f.properties.risk_score),
+          fillOpacity:.65,color:'#000',weight:.3
+        }),
         onEachFeature:(f,layer)=>{
           const p=f.properties;
           layer.on('click',function(e){
@@ -557,17 +621,20 @@
           });
           layer.on('mouseover',function(){this.setStyle({fillOpacity:.9,weight:1.5,color:'#fff'});});
           layer.on('mouseout', function(){this.setStyle({fillOpacity:.65,weight:.3,color:'#000'});});
-          layer.bindTooltip('<b>'+p.risk_level+'</b> — '+(p.risk_score*100).toFixed(1)+'%<br>Crimes: '+p.total_crimes,{sticky:true});
+          layer.bindTooltip(
+            '<b>'+p.risk_level+'</b> — '+(p.risk_score*100).toFixed(1)+'%<br>Crimes: '+p.total_crimes,
+            {sticky:true}
+          );
         }
       }).addTo(map);
       updateStats(allFeatures);
       setApi('online','Live — '+data.total_cells+' zones');
       document.getElementById('loading-overlay').style.display='none';
-      if(heatLayer) buildHeatLayer();
+      if(document.getElementById('tog-heat').checked) buildHeatLayer();
     }catch(err){
-      setApi('offline','API Offline');
-      document.getElementById('ld-sub').textContent='API offline — start your server';
-      setTimeout(()=>{document.getElementById('loading-overlay').style.display='none';},2500);
+      setApi('offline','Starting up...');
+      document.getElementById('ld-sub').textContent='API is waking up — retrying in 30 seconds...';
+      setTimeout(()=>loadHeatmap(type), 30000);
     }
   }
 
@@ -576,6 +643,11 @@
     btn.classList.add('active');
     loadHeatmap(btn.dataset.type);
   }
+
+  // Keep Render API awake — pings every 14 minutes
+  setInterval(async()=>{
+    try{ await fetch(API_URL+'/health'); }catch(e){}
+  }, 840000);
 
   loadHeatmap('composite');
 </script>
